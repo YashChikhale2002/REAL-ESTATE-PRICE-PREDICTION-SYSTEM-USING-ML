@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price Prediction - Real Estate ML</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🏠 Real Estate ML</h1>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('predict') }}" class="active">Predict</a></li>
+                <li><a href="{{ url_for('history') }}">History</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Property Price Prediction</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% if prediction %}
+        <div class="card prediction-result">
+            <h2>Prediction Results</h2>
+            <div class="prediction-price">
+                <h3>Estimated Price</h3>
+                <p class="price-value">${{ "{:,.2f}".format(prediction.predicted_price) }}</p>
+            </div>
+            <div class="price-range">
+                <p><strong>Price Range:</strong></p>
+                <p>${{ "{:,.2f}".format(prediction.lower_bound) }} - ${{ "{:,.2f}".format(prediction.upper_bound) }}</p>
+                <p class="confidence">({{ prediction.confidence_percentage }}% confidence interval)</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <h2>Enter Property Details</h2>
+            <form method="POST" action="{{ url_for('predict') }}">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Area (sqft)*</label>
+                        <input type="number" name="area_sqft" required step="0.01" 
+                               value="{{ property_data.area_sqft if property_data else '' }}" 
+                               class="form-control" placeholder="e.g., 2000">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Bedrooms*</label>
+                        <input type="number" name="bedrooms" required 
+                               value="{{ property_data.bedrooms if property_data else '' }}"
+                               class="form-control" placeholder="e.g., 3">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Bathrooms*</label>
+                        <input type="number" name="bathrooms" required 
+                               value="{{ property_data.bathrooms if property_data else '' }}"
+                               class="form-control" placeholder="e.g., 2">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Floors*</label>
+                        <input type="number" name="floors" required 
+                               value="{{ property_data.floors if property_data else '' }}"
+                               class="form-control" placeholder="e.g., 2">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Age (years)*</label>
+                        <input type="number" name="age_years" required 
+                               value="{{ property_data.age_years if property_data else '' }}"
+                               class="form-control" placeholder="e.g., 5">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Parking Spaces*</label>
+                        <input type="number" name="parking_spaces" required 
+                               value="{{ property_data.parking_spaces if property_data else '' }}"
+                               class="form-control" placeholder="e.g., 2">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Distance to City Center (km)*</label>
+                        <input type="number" name="distance_to_city_center_km" required step="0.01"
+                               value="{{ property_data.distance_to_city_center_km if property_data else '' }}"
+                               class="form-control" placeholder="e.g., 10.5">
+                    </div>
+                </div>
+
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" name="has_garden" value="1" 
+                               {% if property_data and property_data.has_garden %}checked{% endif %}>
+                        Has Garden
+                    </label>
+                    <label>
+                        <input type="checkbox" name="has_pool" value="1"
+                               {% if property_data and property_data.has_pool %}checked{% endif %}>
+                        Has Pool
+                    </label>
+                    <label>
+                        <input type="checkbox" name="has_garage" value="1"
+                               {% if property_data and property_data.has_garage %}checked{% endif %}>
+                        Has Garage
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-large">Predict Price</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

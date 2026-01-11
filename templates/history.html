@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History - Real Estate ML</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🏠 Real Estate ML</h1>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('predict') }}">Predict</a></li>
+                <li><a href="{{ url_for('history') }}" class="active">History</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Prediction & Training History</h1>
+
+        <div class="card">
+            <h2>Recent Predictions</h2>
+            {% if predictions %}
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Predicted Price</th>
+                            <th>Model Used</th>
+                            <th>Location</th>
+                            <th>Property Type</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pred in predictions %}
+                        <tr>
+                            <td>{{ pred.id }}</td>
+                            <td>${{ "{:,.2f}".format(pred.predicted_price) }}</td>
+                            <td>{{ pred.model_used }}</td>
+                            <td>{{ pred.location or 'N/A' }}</td>
+                            <td>{{ pred.property_type or 'N/A' }}</td>
+                            <td>{{ pred.prediction_date }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p>No predictions found.</p>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h2>Model Training History</h2>
+            {% if training_history %}
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Model Name</th>
+                            <th>R² Score</th>
+                            <th>RMSE</th>
+                            <th>MAE</th>
+                            <th>Training Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for history in training_history %}
+                        <tr>
+                            <td>{{ history.id }}</td>
+                            <td>{{ history.model_name }}</td>
+                            <td>{{ "%.4f"|format(history.r2_score) if history.r2_score else 'N/A' }}</td>
+                            <td>${{ "{:,.2f}".format(history.rmse) if history.rmse else 'N/A' }}</td>
+                            <td>${{ "{:,.2f}".format(history.mae) if history.mae else 'N/A' }}</td>
+                            <td>{{ history.training_date }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p>No training history found.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

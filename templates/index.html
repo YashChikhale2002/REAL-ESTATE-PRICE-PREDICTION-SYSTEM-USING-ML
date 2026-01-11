@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Estate Price Prediction System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🏠 Real Estate ML</h1>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('predict') }}">Predict</a></li>
+                <li><a href="{{ url_for('history') }}">History</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero">
+            <h1>Real Estate Price Prediction System</h1>
+            <p>Machine Learning powered property price predictions using Python and SQLite</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% if metrics %}
+        <div class="card metrics-card">
+            <h2>Training Results</h2>
+            <div class="metrics-grid">
+                <div class="metric">
+                    <h3>R² Score</h3>
+                    <p>{{ "%.4f"|format(metrics.r2_score) }}</p>
+                </div>
+                <div class="metric">
+                    <h3>RMSE</h3>
+                    <p>${{ "{:,.2f}".format(metrics.rmse) }}</p>
+                </div>
+                <div class="metric">
+                    <h3>MAE</h3>
+                    <p>${{ "{:,.2f}".format(metrics.mae) }}</p>
+                </div>
+                <div class="metric">
+                    <h3>Accuracy</h3>
+                    <p>{{ "%.2f"|format(metrics.accuracy) }}%</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="cards-grid">
+            <div class="card">
+                <h2>🎯 Make Prediction</h2>
+                <p>Use our trained ML model to predict real estate prices based on property features.</p>
+                <a href="{{ url_for('predict') }}" class="btn btn-primary">Start Prediction</a>
+            </div>
+
+            <div class="card">
+                <h2>🧠 Train Model</h2>
+                <p>Train a new machine learning model using the properties in the database.</p>
+                <form method="POST" action="{{ url_for('train') }}">
+                    <select name="model_type" class="form-control">
+                        <option value="random_forest">Random Forest</option>
+                        <option value="xgboost">XGBoost</option>
+                        <option value="linear_regression">Linear Regression</option>
+                    </select>
+                    <button type="submit" class="btn btn-success">Train Model</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>➕ Add Property</h2>
+                <p>Add new property data to the database for training.</p>
+                <button onclick="toggleForm('addPropertyForm')" class="btn btn-secondary">Add Property</button>
+            </div>
+
+            <div class="card">
+                <h2>📊 View History</h2>
+                <p>View prediction history and model training records.</p>
+                <a href="{{ url_for('history') }}" class="btn btn-info">View History</a>
+            </div>
+        </div>
+
+        <div id="addPropertyForm" class="form-container" style="display: none;">
+            <h2>Add New Property</h2>
+            <form method="POST" action="{{ url_for('add_property') }}">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Area (sqft)</label>
+                        <input type="number" name="area_sqft" required step="0.01" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Bedrooms</label>
+                        <input type="number" name="bedrooms" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Bathrooms</label>
+                        <input type="number" name="bathrooms" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Floors</label>
+                        <input type="number" name="floors" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Age (years)</label>
+                        <input type="number" name="age_years" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Parking Spaces</label>
+                        <input type="number" name="parking_spaces" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Distance to City (km)</label>
+                        <input type="number" name="distance_to_city_center_km" required step="0.01" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Actual Price ($)</label>
+                        <input type="number" name="actual_price" required step="0.01" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" name="location" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Property Type</label>
+                        <select name="property_type" class="form-control">
+                            <option value="Apartment">Apartment</option>
+                            <option value="House">House</option>
+                            <option value="Villa">Villa</option>
+                            <option value="Condo">Condo</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="has_garden" value="1"> Has Garden</label>
+                    <label><input type="checkbox" name="has_pool" value="1"> Has Pool</label>
+                    <label><input type="checkbox" name="has_garage" value="1"> Has Garage</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Add Property</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
